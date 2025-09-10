@@ -10,7 +10,8 @@ RUN jenkins-plugin-cli --plugins github:1.34.4 \
                                  simple-theme-plugin:103.va_161d09c38c7 \
                                  kubernetes:1.30.10 \
                                  pipeline-stage-view:2.24 \
-                                 github-branch-source:1677.v731f745ea_0cf 
+                                 github-branch-source:1677.v731f745ea_0cf\
+                                 handlebars:3.0.8
 
 # install Maven, Java, Docker
 RUN apk add --no-cache maven \
