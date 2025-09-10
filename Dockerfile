@@ -1,4 +1,4 @@
-from jenkins/jenkins:2.441-alpine-jdk21
+FROM jenkins/jenkins:2.441-alpine-jdk21
 USER root
 # Pipeline
 
