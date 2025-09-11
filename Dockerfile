@@ -1,26 +1,22 @@
-FROM jenkins/jenkins:2.441-alpine-jdk21
+FROM jenkins/jenkins:lts-alpine
+
 USER root
-# Pipeline
 
+# Instalar dependencias: Maven, Docker CLI, gettext
+RUN apk add --no-cache maven docker gettext
 
-# RUN jenkins-plugin-cli --plugins "workflow-aggregator github ws-cleanup greenballs simple-theme-plugin kubernetes docker-workflow kubernetes-cli github-branch-source" 
-RUN jenkins-plugin-cli --plugins github:1.34.4 \
-                                 workflow-aggregator:581.v0c46fa_697ffd \
-                                 ws-cleanup:0.42 \
-                                 simple-theme-plugin:103.va_161d09c38c7 \
-                                 kubernetes:1.30.10 \
-                                 pipeline-stage-view:2.24 \
-                                 github-branch-source:1677.v731f745ea_0cf 
+# Instalar kubectl con checksum
+RUN curl -LO "https://dl.k8s.io/release/$(curl -Ls https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
+    && curl -LO "https://dl.k8s.io/release/$(curl -Ls https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256" \
+    && echo "$(cat kubectl.sha256)  kubectl" | sha256sum -c - \
+    && chmod +x kubectl && mv kubectl /usr/local/bin/ \
+    && rm kubectl.sha256
 
-# install Maven, Java, Docker
-RUN apk add --no-cache maven \
-    openjdk17 \
-    docker \
-    gettext
+# Plugins Jenkins (con lista controlada)
+COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
+RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/ref/plugins.txt
 
-# Kubectl
-RUN     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && chmod +x ./kubectl && mv ./kubectl /usr/local/bin/kubectl
+# Ajustar permisos
+RUN chown -R jenkins:jenkins "$JENKINS_HOME" /usr/share/jenkins/ref
 
-# See https://github.com/kubernetes/minikube/issues/956.
-# THIS IS FOR TESTING ONLY - it is not production standard (we're running as root!)
-RUN chown -R root "$JENKINS_HOME" /usr/share/jenkins/ref
+USER jenkins
