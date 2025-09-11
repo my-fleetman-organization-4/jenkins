@@ -1,0 +1,7 @@
+github:1.38.0
+workflow-aggregator:596.v8c21c963d92d
+ws-cleanup:0.45
+simple-theme-plugin:0.7
+kubernetes:4297.v28115e09422c
+pipeline-stage-view:2.34
+github-branch-source:1809.v3a_420d230b_a_5
